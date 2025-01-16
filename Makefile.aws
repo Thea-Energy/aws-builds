@@ -19,10 +19,10 @@
 
 # paths to netcdf
 # NETCDF_DIR is defined by cray-netcdf-hdf5parallel module
-NETCDF_ROOT = ${NETCDF_DIR}
-NETCDF_FORTRAN_ROOT = ${NETCDF_FORTRAN_DIR}
+NETCDF_ROOT = ${netcdf_install_dir}
+NETCDF_FORTRAN_ROOT = ${netcdf_fortran_install_dir}
 # HDF5_DIR is defined by cray-hdf5-parallel module
-HDF5_ROOT = ${HDF5_DIR}
+HDF5_ROOT = ${hdf5_install_dir}
 NETCDF_INC = -I ${NETCDF_ROOT}/include
 NETCDF_LIB = -L ${NETCDF_ROOT}/lib -lnetcdf -L${NETCDF_FORTRAN_ROOT}/lib -lnetcdff -L${HDF5_ROOT}/lib -lhdf5 -lhdf5_hl -L/usr/bin -lcurl -lxml2
 
@@ -42,8 +42,8 @@ CUDA_LIB = -L ${NVHPC_ROOT}/math_libs/lib64 -lcufft_static -lcublas -lcusolver -
 
 # paths to gsl 
 # GSL_ROOT is defined by gsl module
-GSL_INC = -I ${GSL_ROOT}/include
-GSL_LIB = -L ${GSL_ROOT}/lib -lgsl -lgslcblas
+GSL_INC = -I ${gsl_install_dir}/include
+GSL_LIB = -L ${gsl_install_dir}/lib -lgsl -lgslcblas
 
 # additional c libraries required for linking. these are already in LD_LIBRARY_PATH
 C_LIB = -lm -lpthread -ldl
