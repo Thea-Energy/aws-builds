@@ -40,12 +40,13 @@ if [ ${install_desc} == "true" ]; then
 	export PYTHONPATH=/ebs-shared/DESC:$PYTHONPATH
     fi
     cd DESC
-    conda create --name desc-env python=3.11 --yes
+    conda create --name desc-env python=3.12 --yes
     conda activate desc-env
     pip install nvidia-cudnn-cu12
-    pip install --upgrade "jax[cuda12]"
     pip install -r requirements.txt
     pip install -r devtools/dev-requirements.txt
+    jax_temp_var="$(pip freeze | grep -i jax | head -1 | sed "s/jax==//")"
+    pip install -U "jax[cuda12]==$jax_temp_var"
 fi
 
 # ---------------------------------------
