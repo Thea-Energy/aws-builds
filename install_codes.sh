@@ -45,8 +45,7 @@ if [ ${install_desc} == "true" ]; then
     pip install nvidia-cudnn-cu12
     pip install -r requirements.txt
     pip install -r devtools/dev-requirements.txt
-    jax_temp_var="$(pip freeze | grep -i jax | head -1 | sed "s/jax==//")"
-    pip install -U "jax[cuda12]==$jax_temp_var"
+    pip install "jax[cuda12]"
 fi
 
 # ---------------------------------------
