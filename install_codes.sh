@@ -63,7 +63,12 @@ if [ ${install_terpsichore} == "true" ]; then
     fi
     cd TERPSICHORE
     git checkout dynamic
-    make
+    if [ -f "tpr_ap_THEA.x" ]; then
+	echo "TERPSICHORE is already compiled!"
+    else
+	make clean
+	make
+    fi
 fi
     
 # ---------------------------------------
@@ -91,6 +96,7 @@ if [ ${install_gx} == "true" ]; then
     if [ -f "gx" ]; then
 	echo "GX is already compiled!"
     else
+	make clean
 	make
     fi
 fi

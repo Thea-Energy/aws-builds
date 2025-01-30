@@ -6,13 +6,13 @@ aws_repo_dir="$1"
 base_dir="$2"
 install_root="${base_dir}/libraries"
 
-if [ "$3" == "false" ]; then
-    install_miniconda="false"
-    install_nvhpc="false"
-    install_gsl="false"
-    install_hdf5="false"
-    install_netcdf="false"
-    install_netcdf_fortran="false"
+if [ "$3" == "true" ]; then
+    install_miniconda="true"
+    install_nvhpc="true"
+    install_gsl="true"
+    install_hdf5="true"
+    install_netcdf="true"
+    install_netcdf_fortran="true"
 else
     # toggle install for each library
     install_miniconda="$4"
@@ -200,8 +200,8 @@ fi
 #----------------
 
 export hdf5_install_dir="${install_root}/hdf5"
-hdf5_url="https://support.hdfgroup.org/releases/hdf5/v1_14/v1_14_5/downloads/hdf5-1.14.5.tar.gz"
-hdf5_tar_file="hdf5-1.14.5.tar.gz"
+hdf5_url="https://support.hdfgroup.org/archive/support/ftp/HDF5/releases/hdf5-1.10/hdf5-1.10.6/src/hdf5-1.10.6.tar.gz"
+hdf5_tar_file="hdf5-1.10.6.tar.gz"
 hdf5_config_options="--prefix=${hdf5_install_dir} CC=mpicc --enable-parallel"
 hdf5_install_options="PREFIX=${hdf5_install_dir}/bin"
 
@@ -214,8 +214,8 @@ fi
 #----------------
 
 export netcdf_install_dir="${install_root}/netcdf"
-netcdf_url="https://github.com/Unidata/netcdf-c/archive/refs/tags/v4.9.2.tar.gz"
-netcdf_tar_file="v4.9.2.tar.gz"
+netcdf_url="https://github.com/Unidata/netcdf-c/archive/refs/tags/v4.7.4.tar.gz"
+netcdf_tar_file="v4.7.4.tar.gz"
 netcdf_config_options="--prefix=${netcdf_install_dir} CC=mpicc --disable-shared --enable-parallel-tests"
 netcdf_install_options="PREFIX=${netcdf_install_dir}/bin"
 
@@ -229,10 +229,9 @@ fi
 # Netcdf-Fortran Installation
 #----------------
 
-
-export netcdf_fortran_install_dir="${netcdf_install_dir}/fortran"
-netcdf_fortran_url="https://github.com/Unidata/netcdf-fortran/archive/refs/tags/v4.6.0.tar.gz"
-netcdf_fortran_tar_file="v4.6.0.tar.gz"
+export netcdf_fortran_install_dir="${netcdf_install_dir}" # fixed to be the same as netcdf-c above
+netcdf_fortran_url="https://downloads.unidata.ucar.edu/netcdf-fortran/4.5.3/netcdf-fortran-4.5.3.tar.gz"
+netcdf_fortran_tar_file="netcdf-fortran-4.5.3.tar.gz"
 export CFLAGS="-DgFortran"
 export CPPFLAGS="-I${netcdf_install_dir}/include -I${hdf5_install_dir}/include -I/usr/include"
 export LDFLAGS="-L${netcdf_install_dir}/lib -L${hdf5_install_dir}/lib -L/usr/lib"
