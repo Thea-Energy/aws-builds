@@ -1,21 +1,4 @@
-# Makefile for perlmutter (NERSC)
-# Maintainer: Noah Mandell (nmandell@pppl.gov)
-#
-# add and uncomment the following in your .bashrc (or equivalent, depending on preferred shell; for csh, need to use setenv instead of export, etc):
-#
-# export GK_SYSTEM=perlmutter
-# module load PrgEnv-gnu
-# module load nvhpc-mixed/23.9
-# module load cray-hdf5-parallel
-# module load cray-netcdf-hdf5parallel
-# module load e4s
-# module load nccl/2.18.3-cu12
-# module load python
-# spack env activate -V gcc
-# spack load gsl
-# export GSL_ROOT=$(spack location -i gsl)
-# export LD_LIBRARY_PATH=$GSL_ROOT/lib:$LD_LIBRARY_PATH
-#
+# GX Makefile for AWS
 
 # paths to netcdf
 # NETCDF_DIR is defined by cray-netcdf-hdf5parallel module
@@ -60,6 +43,4 @@ ifeq ($(debug),on)
 else
   NVCCFLAGS += -O3
 endif
-
-GS2_PATH = /global/homes/n/nmandell/gs2
 
