@@ -90,7 +90,7 @@ if [ ${install_gx} == "true" ]; then
 	git clone https://bitbucket.org/gyrokinetics/gx.git
     fi
     cd gx
-    cp ${aws_repo_dir}/Makefile.aws Makefiles
+    cp ${aws_repo_dir}/makefiles/Makefile.aws Makefiles
     #git checkout next
 
     if [ -f "gx" ]; then
