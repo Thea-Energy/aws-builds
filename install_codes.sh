@@ -42,8 +42,7 @@ if [ ${install_desc} == "true" ]; then
     cd DESC
     conda create --name desc-env python=3.12 --yes
     conda activate desc-env
-    pip install nvidia-cudnn-cu12
-    pip install -r requirements.txt
+    pip install --editable .
     pip install -r devtools/dev-requirements.txt
     pip install "jax[cuda12]"
 fi
