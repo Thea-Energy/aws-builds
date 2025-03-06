@@ -8,10 +8,12 @@ if [ "$3" == "true" ]; then
     install_desc="true"
     install_terpsichore="true"
     install_gx="true"
+    install_t3d="true"
 else
     install_desc="$4"
     install_terpsichore="$5"
     install_gx="$6"
+    install_t3d="$7"
 fi
 
 # Clear positional arguments
@@ -98,6 +100,68 @@ if [ ${install_gx} == "true" ]; then
 	make clean
 	make
     fi
+fi
+
+cd ${aws_repo_dir}
+
+# ---------------------------------------
+# T3D Build
+# ---------------------------------------
+
+cd ${code_root}
+
+
+if [ ${install_t3d} == "true" ]; then
+
+    conda deactivate
+    
+    
+    if [ -d "gx" ]; then
+	cd gx
+	if [ -f "gx" ]; then
+	    export GX_PATH=${code_root}/gx
+	    echo "GX is compiled"
+	else
+	    echo "ERROR: GX must be compiled to use T3D effectively"
+	    exit 1
+	fi
+	cd ${code_root}
+    else
+	echo "ERROR: GX must be compiled to use T3D effectively"
+	exit 1
+    fi
+
+    if [ -d "t3d" ]; then
+	echo "T3D repo already exists"
+    else
+	git clone https://bitbucket.org/gyrokinetics/t3d.git
+    fi
+    cd t3d
+    conda install -c conda-forge adios2
+    conda env create -f environment.yml --yes
+    conda activate t3d
+
+    # Install booz_xform in conda environment first
+    cd ${code_root}
+    if [ -d "booz_xform" ]; then
+	echo "booz_xform repo already exists"
+    else
+	git clone https://github.com/hiddenSymmetries/booz_xform.git
+    fi
+    cd booz_xform
+    pip install setuptools
+    pip install wheel
+    pip install ninja
+    pip install pybind11
+    pip install cmake
+    mkdir build
+    cd build
+    cmake -DCMAKE_CXX_COMPILER=mpicxx ..
+    make -j
+
+    # Install T3D w/ GX capabilities
+    cd ${code_root}/t3d
+    pip install -e .[gx]
 fi
 
 cd ${aws_repo_dir}
