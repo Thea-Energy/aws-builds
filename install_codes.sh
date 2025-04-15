@@ -79,10 +79,19 @@ cd ${code_root}
 
 export GK_SYSTEM=aws
 export CUDAARCH=${cuda_architecture}
+export CUDA_VERSION=12.4
 export OPENMPI_DIR=/opt/amazon/openmpi5
-export NVIDIA_PATH=${NVHPC_INSTALL_DIR}/Linux_x86_64/23.11
-export NCCL_HOME=${NVIDIA_PATH}/comm_libs/nccl
-export LD_LIBRARY_PATH=${netcdf_install_dir}/lib:${hdf5_install_dir}/lib:${netcdf_fortran_install_dir}/lib:${gsl_install_dir}/lib:${NVIDIA_PATH}/math_libs/lib64:${NCCL_HOME}/lib    
+#export MPICH_DIR=/ebs-shared/libraries/mpich
+#export NVIDIA_PATH=${NVHPC_INSTALL_DIR}/Linux_x86_64/23.11
+export NVIDIA_PATH=${NVHPC_INSTALL_DIR}/Linux_x86_64/24.5
+export NCCL_HOME=${NVIDIA_PATH}/comm_libs/${CUDA_VERSION}/nccl
+export PATH=${NVIDIA_PATH}/cuda/12.4/bin:$PATH
+export LD_LIBRARY_PATH=${OPENMPI_DIR}/lib:${netcdf_install_dir}/lib:${hdf5_install_dir}/lib:${netcdf_fortran_install_dir}/lib:${gsl_install_dir}/lib:${NVIDIA_PATH}/math_libs/${CUDA_VERSION}/lib64:${NVIDIA_PATH}/cuda/lib64:${NCCL_HOME}/lib:${PATH}
+
+# HACK
+cd gx
+cp ${aws_repo_dir}/makefiles/Makefile.aws Makefiles
+
 if [ ${install_gx} == "true" ]; then
 
     if [ -d "gx" ]; then
@@ -90,8 +99,6 @@ if [ ${install_gx} == "true" ]; then
     else
 	git clone https://bitbucket.org/gyrokinetics/gx.git
     fi
-    cd gx
-    cp ${aws_repo_dir}/makefiles/Makefile.aws Makefiles
     #git checkout next
 
     if [ -f "gx" ]; then

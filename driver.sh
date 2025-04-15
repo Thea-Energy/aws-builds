@@ -36,7 +36,6 @@ else
     source ./install_libraries.sh "${aws_repo_dir}" "${base_dir}" "false" "${install_miniconda}" "${install_nvhpc}" "${install_gsl}" "${install_hdf5}" "${install_netcdf}" "${install_netcdf_fortran}"
 fi
 
-
 if [ "${INSTALL_ALL_CODES}" == "true" ]; then
     source ./install_codes.sh "${aws_repo_dir}" "${base_dir}" "true"
 else
