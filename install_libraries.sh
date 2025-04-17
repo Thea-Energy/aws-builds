@@ -33,6 +33,8 @@ if [ ! -d "${install_root}" ]; then
     mkdir ${install_root}
 fi
 
+#export PATH=/ebs-shared/libraries/mpich/bin:$PATH
+#export LD_LIBRARY_PATH=/ebs-shared/libraries/mpich/lib:$LD_LIBRARY_PATH
 module load openmpi5/5.0.3
 
 get_cuda_architecture() {
@@ -43,6 +45,7 @@ get_cuda_architecture() {
 	*"H100"*) echo "90" ;;
 	*"A10"*) echo "86" ;;
 	*"L40"*) echo "89" ;;
+	*"L4"*) echo "89" ;;
 	*) echo "Unknown GPU model: $gpu_model" ;;
     esac
 }
@@ -167,19 +170,33 @@ fi
 # NVIDIA HPC SDK Installation
 #----------------
 
-nvhpc_url="https://developer.download.nvidia.com/hpc-sdk/23.11/nvhpc_2023_2311_Linux_x86_64_cuda_multi.tar.gz"
-nvhpc_tar_file="nvhpc_2023_2311_Linux_x86_64_cuda_multi.tar.gz"
+#nvhpc_url="https://developer.download.nvidia.com/hpc-sdk/23.11/nvhpc_2023_2311_Linux_x86_64_cuda_multi.tar.gz"
+nvhpc_url="https://developer.download.nvidia.com/hpc-sdk/24.5/nvhpc_2024_245_Linux_x86_64_cuda_12.4.tar.gz"
+#nvhpc_tar_file="nvhpc_2023_2311_Linux_x86_64_cuda_multi.tar.gz"
+nvhpc_tar_file="nvhpc_2024_245_Linux_x86_64_cuda_12.4.tar.gz"
 export cuda_architecture=$(get_cuda_architecture)
 export NVHPC_SILENT="true"
-export NVHPC_INSTALL_DIR=${install_root}/nvhpc
+export NVHPC_INSTALL_DIR=${install_root}/nvhpc_p5
 export NVHPC_INSTALL_TYPE="single"
+export NVHPC_DEFAULT_CUDA=12.4
+export NVHPC_STDPAR_CUDACC=90
 custom_nvhpc_install="./install"
 
 if [ "${install_nvhpc}" == "true" ]; then
     install_package "NVHPC" "${NVHPC_INSTALL_DIR}" "${nvhpc_url}" "${nvhpc_tar_file}" "false" "none" "${custom_nvhpc_install}" "true"
 fi
 
-module load ${NVHPC_INSTALL_DIR}/modulefiles/nvhpc-nompi/23.11
+#module load ${NVHPC_INSTALL_DIR}/modulefiles/nvhpc-nompi/23.11
+module load ${NVHPC_INSTALL_DIR}/modulefiles/nvhpc-nompi/24.5
+
+#----------------
+# MPICH Installation
+#----------------
+
+mpich_url="https://www.mpich.org/static/downloads/3.4a2/mpich-3.4a2.tar.gz"
+mpich_tar_file="mpich-3.4a2.tar.gz"
+mpich_config_options="./configure --prefix=/ebs-shared/libraries/mpich --with-device=ch4:ofi --with-slurm=/opt/slurm --with-libfabric=/opt/amazon/efa --enable-fortran=no"
+
 
 #----------------
 # GNU Scientific Library (GSL) Installation
@@ -200,9 +217,12 @@ fi
 #----------------
 
 export hdf5_install_dir="${install_root}/hdf5"
+export HDF5_DIR="${hdf5_install_dir}"
+export PATH="${hdf5_install_dir}/bin:$PATH"
 hdf5_url="https://support.hdfgroup.org/archive/support/ftp/HDF5/releases/hdf5-1.10/hdf5-1.10.6/src/hdf5-1.10.6.tar.gz"
 hdf5_tar_file="hdf5-1.10.6.tar.gz"
 hdf5_config_options="--prefix=${hdf5_install_dir} CC=mpicc --enable-parallel"
+#hdf5_config_options="--prefix=${hdf5_install_dir} CC=gcc --disable-shared --enable-static --disable-parallel --disable-threadsafe --disable-szlib --disable-zlib --disable-dlopen --disable-plugin --with-zlib=no --with-default-plugindir=no --enable-static-exec"
 hdf5_install_options="PREFIX=${hdf5_install_dir}/bin"
 
 if [ "${install_hdf5}" == "true" ]; then    
@@ -214,9 +234,23 @@ fi
 #----------------
 
 export netcdf_install_dir="${install_root}/netcdf"
-netcdf_url="https://github.com/Unidata/netcdf-c/archive/refs/tags/v4.7.4.tar.gz"
-netcdf_tar_file="v4.7.4.tar.gz"
-netcdf_config_options="--prefix=${netcdf_install_dir} CC=mpicc --disable-shared --enable-parallel-tests"
+export NETCDF_DIR="${netcdf_install_dir}"
+export PATH="${netcdf_install_dir}/bin:$PATH"
+#netcdf_url="https://github.com/Unidata/netcdf-c/archive/refs/tags/v4.7.4.tar.gz
+netcdf_url="https://github.com/Unidata/netcdf-c/archive/refs/tags/v4.9.1.tar.gz"
+#netcdf_tar_file="v4.7.4.tar.gz"
+netcdf_tar_file="v4.9.1.tar.gz"
+#netcdf_config_options="--prefix=${netcdf_install_dir} CC=mpicc --disable-shared --enable-parallel-tests"
+netcdf_config_options="--prefix=${netcdf_install_dir} CC=mpicc --enable-parallel-tests"
+
+# static x86 
+#netcdf_config_options="--prefix=${netcdf_install_dir} CC=gcc --disable-shared --enable-static --disable-dap --disable-byterange --disable-logging --disable-hdf5"
+
+# static ARM
+#export AR=aarch64-linux-gnu-ar
+#export RANLIB=aarch64-linux-gnu-ranlib
+#export LD=aarch64-linux-gnu-ld
+#netcdf_config_options="--host=aarch64-linux --prefix=${netcdf_install_dir} CC=aarch64-linux-gnu-gcc --disable-shared --enable-static --disable-dap --disable-byterange --disable-logging --disable-hdf5"
 netcdf_install_options="PREFIX=${netcdf_install_dir}/bin"
 
 export CPPFLAGS="-I${hdf5_install_dir}/include -I/usr/include"
@@ -235,9 +269,17 @@ netcdf_fortran_tar_file="netcdf-fortran-4.5.3.tar.gz"
 export CFLAGS="-DgFortran"
 export CPPFLAGS="-I${netcdf_install_dir}/include -I${hdf5_install_dir}/include -I/usr/include"
 export LDFLAGS="-L${netcdf_install_dir}/lib -L${hdf5_install_dir}/lib -L/usr/lib"
-export LD_LIBRARY_PATH="${netcdf_install_dir}/lib:${hdf5_install_dir}/lib:/usr/lib"
-export LIBS="-lnetcdf -lhdf5_hl -lhdf5 -lm -lz -lbz2 -lzstd -lxml2 -lcurl"
-netcdf_fortran_configure_options="--disable-shared --prefix=${netcdf_fortran_install_dir} --disable-fortran-type-check CC=mpicc CXX=mpicxx FC=mpif90"
+export LD_LIBRARY_PATH="${netcdf_install_dir}/lib:${hdf5_install_dir}/lib:/usr/lib:/lib/x86_64-linux-gnu"
+#export LIBS="-lnetcdf -lhdf5_hl -lhdf5 -lm -lz -lbz2 -lzstd -lxml2 -lcurl"
+#netcdf_fortran_configure_options="--disable-shared --prefix=${netcdf_fortran_install_dir} --disable-fortran-type-check CC=mpicc CXX=mpicxx FC=mpif90"
+netcdf_fortran_configure_options="--prefix=${netcdf_fortran_install_dir} --disable-fortran-type-check CC=mpicc CXX=mpicxx FC=mpif90"
+
+# STATic x86
+#netcdf_fortran_configure_options="--prefix=${netcdf_fortran_install_dir} --disable-shared --enable-static --disable-fortran-type-check CC=gcc CXX=cxx FC=gfortran"
+
+# static ARM
+#netcdf_fortran_configure_options="--host=aarch64-linux --prefix=${netcdf_fortran_install_dir} --disable-shared --enable-static --disable-fortran-type-check CC=aarch64-linux-gnu-gcc FC=aarch64-linux-gnu-gfortran"
+
 netcdf_fortran_install_options="PREFIX=${netcdf_fortran_install_dir}/bin"
 
 

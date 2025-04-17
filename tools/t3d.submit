@@ -1,0 +1,24 @@
+#!/bin/bash
+#SBATCH --job-name=t3d_test
+#SBATCH --output=t3d.out
+#SBATCH --error=t3d.err
+#SBATCH -N 2
+#SBATCH -n 8
+#SBATCH --gpus-per-node=4
+###SBATCH --gres=gpu:h100:1
+#SBATCH --partition=g6-12xlarge
+#SBATCH --time=01:00:00
+
+cd /ebs-shared/aws-builds
+source driver.sh
+conda activate t3d
+module load libfabric-aws/1.22.0amzn1.0
+cd $SLURM_SUBMIT_DIR
+
+# different exectuables based on AWS instance
+#gpu_model=$(nvidia-smi --query-gpu=name --format=csv,noheader,nounits | head -n 1)
+
+export GX_PATH="/ebs-shared/codes/gx/bin/L4"
+
+t3d t3d_E0611_H.in -l results_E0611_H.out
+

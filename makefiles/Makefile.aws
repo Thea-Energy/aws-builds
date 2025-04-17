@@ -1,5 +1,7 @@
 # GX Makefile for AWS
 
+##export CUDA_VERSION=12.4
+
 # paths to netcdf
 # NETCDF_DIR is defined by cray-netcdf-hdf5parallel module
 NETCDF_ROOT = ${netcdf_install_dir}
@@ -20,8 +22,9 @@ MPI_LIB = -L ${MPI_ROOT}/lib -lmpi
 NVHPC_ROOT = ${NVIDIA_PATH}
 # NCCL_HOME is defined by nccl module
 NCCL_ROOT = ${NCCL_HOME}
-CUDA_INC = -I ${NVHPC_ROOT}/math_libs/include -I ${NCCL_ROOT}/include
-CUDA_LIB = -L ${NVHPC_ROOT}/math_libs/lib64 -lcufft_static -lcublas -lcusolver -lgomp -lcutensor -L ${NCCL_ROOT}/lib -lnccl -L ${NVHPC_ROOT}/cuda/lib64 -lcudart -lculibos -lnvToolsExt
+CUDA_INC = -I ${NVHPC_ROOT}/math_libs/12.4/include -I ${NCCL_ROOT}/include
+##CUDA_INC = -I ${NVHPC_ROOT}/math_libs/include -I ${NCCL_ROOT}/include
+CUDA_LIB = -L ${NVHPC_ROOT}/math_libs/12.4/lib64 -lcufft_static -lcublas -lcusolver -lgomp -lcutensor -L ${NCCL_ROOT}/lib -lnccl -L ${NVHPC_ROOT}/cuda/lib64 -lcudart -lculibos -lnvToolsExt
 
 # paths to gsl 
 # GSL_ROOT is defined by gsl module
@@ -31,12 +34,11 @@ GSL_LIB = -L ${gsl_install_dir}/lib -lgsl -lgslcblas
 # additional c libraries required for linking. these are already in LD_LIBRARY_PATH
 C_LIB = -lm -lpthread -ldl
 
-# Cray names their C++ compiler CC (C compiler is cc)
 CXX = mpicxx
-
 NVCC   = nvcc
-CFLAGS = -fPIC
-NVCCFLAGS = --forward-unknown-to-host-compiler -arch=compute_$(CUDAARCH) -code=sm_$(CUDAARCH) -use_fast_math -fPIC -rdc=true
+CFLAGS = -fPIC --std=c++17
+NVCCFLAGS = -std=c++17 --forward-unknown-to-host-compiler -arch=compute_$(CUDAARCH) -code=sm_$(CUDAARCH) -use_fast_math -fPIC -rdc=true
+LDFLAGS = -dlink
 
 ifeq ($(debug),on)
   NVCCFLAGS += -g -G 
