@@ -156,8 +156,8 @@ if [ ${install_miniconda} == "true" ]; then
     fi
     mkdir -p ${miniconda_install_dir}
     wget ${miniconda_url} -O ${miniconda_install_dir}/miniconda.sh
-    bash ${miniconda_install_dir}/miniconda.sh -b -u -p ${miniconda_install_dir}
-    rm ${miniconda_install_dir}/miniconda.sh
+    bash ${miniconda_install_dir}/Miniconda3-latest-Linux-x86_64.sh -b -u -p ${miniconda_install_dir}
+    rm ${miniconda_install_dir}/Miniconda3-latest-Linux-x86_64.sh
     source ${miniconda_install_dir}/bin/activate
     conda init --all
 else
