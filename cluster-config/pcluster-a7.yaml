@@ -1,0 +1,267 @@
+Region: us-east-1
+Image:
+  Os: ubuntu2204
+
+SharedStorage:
+  - Name: my-ebs
+    StorageType: Ebs
+    MountDir: /ebs-shared
+    EbsSettings:
+      VolumeType: gp3
+      Size: 1000
+  - Name: my-efs
+    StorageType: Efs
+    MountDir: /efs-shared
+    EfsSettings:
+      FileSystemId: fs-0244a41125562b13b # <your-efs-id>
+
+HeadNode:
+  InstanceType: c7a.4xlarge
+  Ssh:
+    KeyName: mike-key #<your-key> #
+    AllowedIps: 10.0.0.0/16
+  Dcv:
+    Enabled: true
+  Networking:
+    SubnetId: subnet-0b0a97953f230342b
+    AdditionalSecurityGroups:
+      - sg-0fff9a1c009feeff6
+  Iam:
+    AdditionalIamPolicies:
+      - Policy: arn:aws:iam::aws:policy/AmazonS3FullAccess
+      - Policy: arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore
+  CustomActions:
+    OnNodeConfigured:
+      Sequence:
+        - Script: 'https://raw.githubusercontent.com/spack/spack-configs/main/AWS/parallelcluster/postinstall.sh'
+
+Scheduling:
+  Scheduler: slurm
+  SlurmQueues:
+
+    - Name: c7a-4xlarge
+      CapacityType: ONDEMAND
+      ComputeResources:
+        - Name: c7a-4xlarge
+          MaxCount: 30
+          MinCount: 0
+          Instances:
+            - InstanceType: c7a.4xlarge
+          DisableSimultaneousMultithreading: true
+      Iam:
+        AdditionalIamPolicies:
+          - Policy: arn:aws:iam::aws:policy/AmazonS3FullAccess
+          - Policy: arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore
+      Networking:
+        SubnetIds:
+          - subnet-00570224dc1c2549c #subnet-034e05b9c89c2e040 #
+        AdditionalSecurityGroups:
+          - sg-0fff9a1c009feeff6 #
+        PlacementGroup:
+          Enabled: true
+
+    - Name: c7i-4xlarge
+      CapacityType: ONDEMAND
+      ComputeResources:
+        - Name: c7i-4xlarge
+          MaxCount: 30
+          MinCount: 0
+          Instances:
+            - InstanceType: c7i.4xlarge
+          DisableSimultaneousMultithreading: true
+      Iam:
+        AdditionalIamPolicies:
+          - Policy: arn:aws:iam::aws:policy/AmazonS3FullAccess
+          - Policy: arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore
+      Networking:
+        SubnetIds:
+          - subnet-00570224dc1c2549c #
+        AdditionalSecurityGroups:
+          - sg-0fff9a1c009feeff6 #
+        PlacementGroup:
+          Enabled: true
+
+    - Name: c6i-2xlarge
+      CapacityType: ONDEMAND
+      ComputeResources:
+        - Name: c6i-2xlarge
+          MaxCount: 30
+          MinCount: 0
+          Instances:
+            - InstanceType: c6i.2xlarge
+          DisableSimultaneousMultithreading: true
+      Iam:
+        AdditionalIamPolicies:
+          - Policy: arn:aws:iam::aws:policy/AmazonS3FullAccess
+          - Policy: arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore
+      Networking:
+        SubnetIds:
+          - subnet-00570224dc1c2549c #
+        AdditionalSecurityGroups:
+          - sg-0fff9a1c009feeff6 #
+        PlacementGroup:
+          Enabled: true
+
+    - Name: g5-4xlarge
+      CapacityType: ONDEMAND
+      ComputeResources:
+        - Name: g5-4xlarge
+          MaxCount: 30
+          MinCount: 0
+          Instances:
+            - InstanceType: g5.4xlarge
+          DisableSimultaneousMultithreading: true
+      Iam:
+        AdditionalIamPolicies:
+          - Policy: arn:aws:iam::aws:policy/AmazonS3FullAccess
+          - Policy: arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore
+      Networking:
+        SubnetIds:
+          - subnet-00570224dc1c2549c #
+        AdditionalSecurityGroups:
+          - sg-0fff9a1c009feeff6 #
+        PlacementGroup:
+          Enabled: true
+
+    - Name: g5-12xlarge
+      CapacityType: ONDEMAND
+      ComputeResources:
+        - Name: g5-12xlarge
+          Efa:
+            Enabled: true
+          MaxCount: 30
+          MinCount: 0
+          Instances:
+            - InstanceType: g5.12xlarge
+          DisableSimultaneousMultithreading: true
+      Iam:
+        AdditionalIamPolicies:
+          - Policy: arn:aws:iam::aws:policy/AmazonS3FullAccess
+          - Policy: arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore
+      Networking:
+        SubnetIds:
+          - subnet-00570224dc1c2549c #
+        AdditionalSecurityGroups:
+          - sg-0fff9a1c009feeff6 #
+        PlacementGroup:
+          Enabled: true
+
+    - Name: g6e-8xlarge
+      CapacityType: ONDEMAND
+      ComputeResources:
+        - Name: g6e-8xlarge
+          Efa:
+            Enabled: true
+          MaxCount: 30
+          MinCount: 0
+          Instances:
+            - InstanceType: g6e.8xlarge
+          DisableSimultaneousMultithreading: true
+      Iam:
+        AdditionalIamPolicies:
+          - Policy: arn:aws:iam::aws:policy/AmazonS3FullAccess
+          - Policy: arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore
+      Networking:
+        SubnetIds:
+          - subnet-00570224dc1c2549c #
+        AdditionalSecurityGroups:
+          - sg-0fff9a1c009feeff6 #
+        PlacementGroup:
+          Enabled: true
+
+    - Name: g6-12xlarge
+      CapacityType: ONDEMAND
+      ComputeResources:
+        - Name: g6-12xlarge
+          Efa:
+            Enabled: true
+          MaxCount: 30
+          MinCount: 0
+          Instances:
+            - InstanceType: g6.12xlarge
+          DisableSimultaneousMultithreading: true
+      Iam:
+        AdditionalIamPolicies:
+          - Policy: arn:aws:iam::aws:policy/AmazonS3FullAccess
+          - Policy: arn:aws:iam::aws:policy/AWSCodeCommitReadOnly
+          - Policy: arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore
+      Networking:
+        SubnetIds:
+          - subnet-00570224dc1c2549c #
+        AdditionalSecurityGroups:
+          - sg-0fff9a1c009feeff6 #
+        PlacementGroup:
+          Enabled: true
+
+    - Name: g6e-12xlarge
+      CapacityType: ONDEMAND
+      ComputeResources:
+        - Name: g6e-12xlarge
+          Efa:
+            Enabled: true
+          MaxCount: 30
+          MinCount: 0
+          Instances:
+            - InstanceType: g6e.12xlarge
+          DisableSimultaneousMultithreading: true
+      Iam:
+        AdditionalIamPolicies:
+          - Policy: arn:aws:iam::aws:policy/AmazonS3FullAccess
+          - Policy: arn:aws:iam::aws:policy/AWSCodeCommitReadOnly
+          - Policy: arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore
+      Networking:
+        SubnetIds:
+          - subnet-00570224dc1c2549c #
+        AdditionalSecurityGroups:
+          - sg-0fff9a1c009feeff6 #
+        PlacementGroup:
+          Enabled: true
+
+    - Name: p5-48xlarge
+      CapacityType: ONDEMAND
+      ComputeResources:
+        - Name: p5-48xlarge
+          Efa:
+            Enabled: true
+          MaxCount: 1
+          MinCount: 0
+          Instances:
+            - InstanceType: p5.48xlarge
+          DisableSimultaneousMultithreading: true
+      Iam:
+        AdditionalIamPolicies:
+          - Policy: arn:aws:iam::aws:policy/AmazonS3FullAccess
+          - Policy: arn:aws:iam::aws:policy/AWSCodeCommitReadOnly
+          - Policy: arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore
+      Networking:
+        SubnetIds:
+          - subnet-00570224dc1c2549c #
+        AdditionalSecurityGroups:
+          - sg-0fff9a1c009feeff6 #
+        PlacementGroup:
+          Enabled: true
+
+    - Name: p5-48xlarge-cblock
+      CapacityType: CAPACITY_BLOCK
+      ComputeResources:
+        - Name: p5-48xlarge-cblock
+          Efa:
+            Enabled: true
+          MaxCount: 2
+          CapacityReservationTarget:
+            CapacityReservationId: cr-0c49fbbf13c61348d
+          MinCount: 2
+          InstanceType: p5.48xlarge
+          DisableSimultaneousMultithreading: true
+      Iam:
+        AdditionalIamPolicies:
+          - Policy: arn:aws:iam::aws:policy/AmazonS3FullAccess
+          - Policy: arn:aws:iam::aws:policy/AWSCodeCommitReadOnly
+          - Policy: arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore
+      Networking:
+        PlacementGroup:
+          Enabled: true # set this to false if using a targeted ODCR
+        SubnetIds:
+          - subnet-002ff53fc69210ba3
+        AdditionalSecurityGroups:
+          - sg-0fff9a1c009feeff6 #
